@@ -1,5 +1,5 @@
 /****************************************************** 
-  Arduino library for communicating though RS-485 Modbus with Trubner's soil moisture sensor (SMT100)
+  Arduino library for communicating though RS-485 Modbus with a chinese djlk ultrasonic sensor
   
   Author: Ghaith alshishani arzonborz@gmail.com
   
@@ -7,33 +7,33 @@
   License: Apache 2.0
  *******************************************************/
 
-#include "SMT100_MODBUS.h"
+#include "Ultrasonic_Sensor_MODBUS.h"
 
-SMT100_MODBUS::SMT100_MODBUS(Stream *port)
+Ultrasonic_Sensor_MODBUS::Ultrasonic_Sensor_MODBUS(Stream *port)
 {
 	_port=port;
 }
 
-// ReadAddress read and retuns the ID address of the SMT100 sensor on the RS485 MODBUS. There should only be one SMT100 sensor connected to the bus at a time because this function uses the broadcast ID address
-int SMT100_MODBUS::ReadAddress()
+// ReadAddress read and retuns the ID address of the Ultrasonic_Sensor sensor on the RS485 MODBUS. There should only be one Ultrasonic_Sensor sensor connected to the bus at a time because this function uses the broadcast ID address
+int Ultrasonic_Sensor_MODBUS::ReadAddress()
 {
-  return this->ReadSMT100(BROADCAST_ID,ADDRESS_REG);
+  return this->ReadUltrasonic_Sensor(BROADCAST_ID,ADDRESS_REG);
 }
 
-// SetAddress returns a boolean to determine succeful operation. This function Sets the ID address of the SMT100 sensor on the RS485 MODBUS. There should only be one SMT100 sensor connected to the bus at a time because this function uses the broadcast ID address
-bool SMT100_MODBUS::SetAddress(byte newId)
+// SetAddress returns a boolean to determine succeful operation. This function Sets the ID address of the Ultrasonic_Sensor sensor on the RS485 MODBUS. There should only be one Ultrasonic_Sensor sensor connected to the bus at a time because this function uses the broadcast ID address
+bool Ultrasonic_Sensor_MODBUS::SetAddress(byte newId)
 {
   return this->ChangeAddress(BROADCAST_ID,newId);
 }
 
 // CheckAddress returns a boolean and checks if the Sensor ID is present on RS485 MODBUS
-bool SMT100_MODBUS::CheckAddress(byte id)
+bool Ultrasonic_Sensor_MODBUS::CheckAddress(byte id)
 {
-  return this->ReadSMT100(id,ADDRESS_REG)==id;
+  return this->ReadUltrasonic_Sensor(id,ADDRESS_REG)==id;
 }
 
-// ChangeAddress changes the id address of a given SMT100 id address if the new address is not already taken on the RS485 MODBUS
-bool SMT100_MODBUS::ChangeAddress(byte oldID , byte newId)
+// ChangeAddress changes the id address of a given Ultrasonic_Sensor id address if the new address is not already taken on the RS485 MODBUS
+bool Ultrasonic_Sensor_MODBUS::ChangeAddress(byte oldID , byte newId)
 {
   // check the args
   if ( oldID<0 || oldID >255 || newId<0 || newId > 255) return false;
@@ -55,22 +55,22 @@ bool SMT100_MODBUS::ChangeAddress(byte oldID , byte newId)
   msg += this->ModRTU_CRC(msg);
 
   byte buf[8];
-  bool transResult = this->RS485_TRANSEIVER( msg , 8, buf, 8, TIMEOUT_SMT100);
+  bool transResult = this->RS485_TRANSEIVER( msg , 8, buf, 8, TIMEOUT_Ultrasonic_Sensor_REALTIME);
   if (!transResult) return false;
   
-  // Check if the SMT100 sensor Address is changed correctly
-  if (buf[1]==0x06 && buf[3]==0x04 && buf[5]==newId) return true;
+  // Check if the Ultrasonic_Sensor sensor Address is changed correctly
+  if (buf[1]==this->StrtoByte(WRITE_REG) && buf[5]==newId) return true;
   else return false;
 }
 
-// reads the data registers from SMT100 sensors with a specified id. returns (-255) when wrong id is passed (-254) when wrong address is passed (-253 & -252) when no correct bytes were recieved
-float SMT100_MODBUS::ReadSMT100(byte id, String reg)
+// reads the data registers from Ultrasonic_Sensor sensors with a specified id. returns (-255) when wrong id is passed (-254) when wrong address is passed (-253 & -252) when no correct bytes were recieved
+float Ultrasonic_Sensor_MODBUS::ReadUltrasonic_Sensor(byte id, String reg)
 {
   if ( id<0 || id >255 )
   {
     return -255;
   }
-  if (reg!=ADDRESS_REG && reg!=COUNTS_REG && reg!=PERMITTIVITY_REG && reg!=WATER_CONTENT_REG && reg!=TEMP_REG )
+  if (reg!=ADDRESS_REG && reg!=PROCESSED_DISTANCE_REG && reg!=REALTIME_DISTANCE_REG )
   {
     return -254;
   }
@@ -89,24 +89,21 @@ float SMT100_MODBUS::ReadSMT100(byte id, String reg)
   //Wait for answer and put it in a buffer
   float retVal;
   byte buf[8];
-  bool transResult = this->RS485_TRANSEIVER( msg , 8, buf, 7, TIMEOUT_SMT100);
+  uint16_t timeout = reg == PROCESSED_DISTANCE_REG ? TIMEOUT_Ultrasonic_Sensor_PROCESSED : TIMEOUT_Ultrasonic_Sensor_REALTIME;
+  bool transResult = this->RS485_TRANSEIVER( msg , 8, buf, 7, timeout);
   if (!transResult) return -253;
 
-  // Check if the SMT100 sensor is read successfully then decode the retVal
-  if (buf[1]==0x03 && buf[2]==0x02) 
+  // Check if the Ultrasonic_Sensor sensor is read successfully then decode the retVal
+  if (buf[1]==StrtoByte(READ_REG)) 
   {
     retVal = buf[3]<<8 | buf[4];
-    if (reg == ADDRESS_REG) return retVal;
-    else if (reg == COUNTS_REG) return retVal;
-    else if (reg == PERMITTIVITY_REG) return retVal/100.0;
-    else if (reg == WATER_CONTENT_REG) return retVal/100.0;
-    else if (reg == TEMP_REG) return (retVal/100.0)-100;
+    return retVal;
   }
   else return -252;
 }
 
 // RS485_TRANSEIVER send number of bytes (String) over RS485 MODBUS and waits for number of expected bytes (array)
-bool SMT100_MODBUS::RS485_TRANSEIVER(String msgSent , byte numOfSentByte, byte* msgReceived, byte numOfReceivedByte, int receiveTimeout)
+bool Ultrasonic_Sensor_MODBUS::RS485_TRANSEIVER(String msgSent , byte numOfSentByte, byte* msgReceived, byte numOfReceivedByte, int receiveTimeout)
 {
   //check if MODBUS msg is not correctly formed
   if (msgSent.length()<numOfSentByte*2) return false;
@@ -150,7 +147,7 @@ bool SMT100_MODBUS::RS485_TRANSEIVER(String msgSent , byte numOfSentByte, byte* 
 }
 
 // Compute the MODBUS RTU CRC
-String SMT100_MODBUS::ModRTU_CRC(String raw_msg_data) {
+String Ultrasonic_Sensor_MODBUS::ModRTU_CRC(String raw_msg_data) {
   //Calc raw_msg_data length
   byte raw_msg_data_byte[raw_msg_data.length() / 2];
   //Convert the raw_msg_data to a byte array raw_msg_data
@@ -195,29 +192,29 @@ String SMT100_MODBUS::ModRTU_CRC(String raw_msg_data) {
 }
 
 //String to byte --> Example: String = "C4" --> byte = {0xC4}
-byte SMT100_MODBUS::StrtoByte (String str_value) {
+byte Ultrasonic_Sensor_MODBUS::StrtoByte (String str_value) {
   char char_buff[3];
   str_value.toCharArray(char_buff, 3);
   byte byte_value = strtoul(char_buff, NULL, 16);
   return byte_value;
 }
 
-int SMT100_MODBUS::available()
+int Ultrasonic_Sensor_MODBUS::available()
 {
 	return _port->available();
 }
 
-int SMT100_MODBUS::peek()
+int Ultrasonic_Sensor_MODBUS::peek()
 {
 	return _port->peek();
 }
 
-int SMT100_MODBUS::read()
+int Ultrasonic_Sensor_MODBUS::read()
 {
 	return _port->read();
 }
 
-size_t SMT100_MODBUS::write(uint8_t c)
+size_t Ultrasonic_Sensor_MODBUS::write(uint8_t c)
 {
 	return _port->write(c);
 }

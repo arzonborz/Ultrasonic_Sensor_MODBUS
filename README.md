@@ -12,7 +12,7 @@
 * Communication with several sensors on the same RS-485 Modbus
 * Set address ID of djlk ultrasonic sensor
 * Change address ID of a specific djlk ultrasonic sensor on-the-fly (even with multiple sensors connected on the same RS-485 Modbus)
-****** Address collision protection before setting/changing address ID
+* Address collision protection before setting/changing address ID
 * Read the data registers of djlk ultrasonic sensor, which are:
   * Address ID
   * real-time distance value
@@ -25,7 +25,7 @@
 
 ### Commands
 ---
-SMT100_MODBUS(Stream *port);
+Ultrasonic_Sensor_MODBUS(Stream *port);
 
 int ReadAddress();
 
@@ -35,7 +35,7 @@ bool CheckAddress(byte id);
 
 bool ChangeAddress(byte oldID , byte newId);
 
-float ReadSMT100(byte id, String reg);
+float ReadUltrasonic_Sensor(byte id, String reg);
 
 bool RS485_TRANSEIVER(String msgSent , byte numOfSentByte, byte* msgReceived, byte numOfReceivedByte, int receiveTimeout);
 

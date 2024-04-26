@@ -1,5 +1,5 @@
 /****************************************************** 
-  Arduino library for communicating though RS-485 Modbus with Trubner's soil moisture sensor (SMT100)
+  Arduino library for communicating though RS-485 Modbus with chinese djlk ultrasonic sensor
   
   Author: Ghaith alshishani arzonborz@gmail.com
   
@@ -7,8 +7,8 @@
   License: Apache 2.0
  *******************************************************/
 
-#ifndef _SMT100_MODBUS_H
-#define _SMT100_MODBUS_H
+#ifndef _Ultrasonic_Sensor_MODBUS_H
+#define _Ultrasonic_Sensor_MODBUS_H
 
 #include <Arduino.h>
 
@@ -17,28 +17,29 @@
 #define READ_REG      "03"
 
 // reading holding registers addresses
-#define ADDRESS_REG       "0004"
-#define COUNTS_REG        "0003"
-#define PERMITTIVITY_REG  "0002"
-#define WATER_CONTENT_REG "0001"
-#define TEMP_REG          "0000"
+#define ADDRESS_REG       		"0200"
+#define PROCESSED_DISTANCE_REG	"0100"
+#define REALTIME_DISTANCE_REG 	"0101"
+
 
 // number of registers to read
 #define ONE16BITS_REG     "0001"
 
-// general SMT100 ID
-#define BROADCAST_ID      0xFD
-#define TIMEOUT_SMT100	  100
+// general Ultrasonic_Sensor ID
+#define BROADCAST_ID      	0xFF
+#define DEFAULT_ID     	 	0x01
+#define TIMEOUT_Ultrasonic_Sensor_REALTIME	  100
+#define TIMEOUT_Ultrasonic_Sensor_PROCESSED	  500
 
-class SMT100_MODBUS
+class Ultrasonic_Sensor_MODBUS
 {
     public:
-        SMT100_MODBUS(Stream *port);
+        Ultrasonic_Sensor_MODBUS(Stream *port);
 		int ReadAddress();
 		bool SetAddress(byte newId);
 		bool CheckAddress(byte id);
 		bool ChangeAddress(byte oldID , byte newId);
-		float ReadSMT100(byte id, String reg);
+		float ReadUltrasonic_Sensor(byte id, String reg);
 		bool RS485_TRANSEIVER(String msgSent , byte numOfSentByte, byte* msgReceived, byte numOfReceivedByte, int receiveTimeout);
 		
     private:

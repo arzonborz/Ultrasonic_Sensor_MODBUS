@@ -1,19 +1,43 @@
-Counts:
-FD 03 00 03 00 01 60 36
-00 03 02 47 26 37 AE
+Chinese djlk Ultrasonic Sensor 
 
-Permittivity:
-FD 03 00 02 00 01 31 F6
-00 03 02 00 8B C5 E3
+RS485 CRC16-Modbus 9600 BAUD 8bit 1stop No parity check
 
-Water content:
-FD 03 00 01 00 01 C1 F6
-00 03 02 00 00 85 84
 
-Temp:
-FD 03 00 00 00 01 90 36
-00 03 02 2F CF D9 E0
+Broadcast address is 0xFF
+Default address is 0x01
 
-Set Address to x: (from 0-255)
-FD 06 00 04 00 xx DC 37
-FD 06 00 04 00 xx 1D F7
+To calculate CRC16/modbus use:
+https://crccalc.com/ 
+
+Reading Processed distance Value:
+Host:
+0x01 0x03 0x01 0x00 0x00 0x01 0x85 0xF6
+Slave response:
+01 03 02 02 2F 3B D3 
+Description: The sensor address is 0x01, the processing distance value is 0x02F2, which converted to decimal is 754mm.
+
+Reading RealTime distance Value:
+Host:
+0x01 0x03 0x01 0x01 0x00 0x01 0xD4 0x36
+Slave response:
+01 03 02 02 EF 3B D3 
+Description: The sensor address is 0x01, the real-time distance value is 0x02EF, which converted to decimal is 751mm.
+
+Changing Slave address:
+Host:
+0x01 0x06 0x02 0x00 0x00 0x05 0x48 0x71
+Slave response:
+01 06 02 00 00 05 48 71 
+Description: The sensor address is modified from 0x01 to 0x05
+
+
+Setting address using Broadcast ID:
+Host:
+0xFF 0x06 0x02 0x00 0x00 0x01 0x5C 0x6C
+Slave response:
+FF 06 02 00 00 01 5C 6C  
+Description: The sensor address is modified from any address to 0x01
+
+Reading address using Broadcast ID:
+0xFF 0x03 0x02 0x00 0x00 0x01 0x90 0x6C
+
