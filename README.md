@@ -1,31 +1,27 @@
-# SMT100_MODBUS
+# Ultrasonic_Sensor_MODBUS
 
 ![Version](https://img.shields.io/badge/Version-v1.0.0-green.svg)
 
-***Please Note: This is a personal effort and Trubner GMBH is not related nor responsible for using or supporting this library***
+***Please Note: This is a personal effort and the product manufacturer is not related nor responsible for using or supporting this library***
 
- Library for communicating though RS-485 Modbus with Trubner's soil moisture sensor (SMT100) using the Arduino platform. Supports most devices.
+ Library for communicating through RS-485 Modbus with a Chinese djlk ultrasonic sensor using the Arduino platform.
 
 ### Features
 ---
 * RS-485 Modbus broadcast functionality
 * Communication with several sensors on the same RS-485 Modbus
-* Set address ID of SMT100 sensor
-* Change address ID of a specific SMT100 sensor on-the-fly (i.e. with multiple sensors connected on the same RS-485 Modbus)
-* Address collision protection before setting/changing address ID
-* Read the data registers of SMT100, which are:
+* Set address ID of djlk ultrasonic sensor
+* Change address ID of a specific djlk ultrasonic sensor on-the-fly (even with multiple sensors connected on the same RS-485 Modbus)
+****** Address collision protection before setting/changing address ID
+* Read the data registers of djlk ultrasonic sensor, which are:
   * Address ID
-  * Temprature
-  * Water content
-  * Permittivity
-  * Counts
+  * real-time distance value
+  * processed distance value
 * Check if an address ID is present on RS-485 Modbus
 
 ### Future changes
 ---
-* TBus mode detection functionality
-* Switch to Modbus mode functionality
-* Clear protocol functionality
+* None
 
 ### Commands
 ---
@@ -51,19 +47,15 @@ If you are having difficulties, please raise an issue.
 
 ### A Bit About this Sensor
 ---
-See extras for the official SMT100 Modbus Guide
+See extras for the djlk ultrasonic sensor documentation.
 
 ### Authors
 ---
-Ghaith alshishani, you can find my contact details below.
+Ghaith Alshishani, you can find my contact details below.
 
 ### License
 ---
 This project is licensed under Apache 2.0 - see the LICENSE.md file for details
-
-### Acknowledgments
-----
-Extended thanks to Trubner for providing my team with the SMT100 sensors and loggers troughout our research.
 
 ### Feedback
 ---
