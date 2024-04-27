@@ -17,12 +17,13 @@
 
 */
 
-#include "Ultrasonic_Sensor_MODBUS.h"
-
-Ultrasonic_Sensor_MODBUS Ultrasonic_Sensor(&Serial); // create an Ultrasonic_Sensor_MODBUS on Serial port (i.e: 0(RX),1(TX) pins or hardware Serial1) 
-
 #include <SoftwareSerial.h> 
 SoftwareSerial mySerial(10, 11); // RX, TX
+
+
+#include "Ultrasonic_Sensor_MODBUS.h"
+Ultrasonic_Sensor_MODBUS Ultrasonic_Sensor(&mySerial); // create an Ultrasonic_Sensor_MODBUS on Serial port (i.e: 0(RX),1(TX) pins or hardware Serial1) 
+
 
 
 
@@ -37,41 +38,41 @@ void loop() {
 
   // Check if id addresses 0x00 and 0x01 are avilable on the Modbus
   bool checkaddress1 = Ultrasonic_Sensor.CheckAddress(0);
-  mySerial.print("  check1=" + String (checkaddress1));
+  Serial.print("  check1=" + String (checkaddress1));
   bool checkaddress2 = Ultrasonic_Sensor.CheckAddress(1);
-  mySerial.print("  check2=" + String (checkaddress2));
+  Serial.print("  check2=" + String (checkaddress2));
   if (checkaddress1 && checkaddress2)
   {
     // First sensor readings
     int addressID = Ultrasonic_Sensor.ReadUltrasonic_Sensor(0x00,ADDRESS_REG);
-    mySerial.print("  ID=" + String (addressID));
+    Serial.print("  ID=" + String (addressID));
     float RT_distance = Ultrasonic_Sensor.ReadUltrasonic_Sensor(0x00,REALTIME_DISTANCE_REG);
-    mySerial.print("  RT_distance=" + String (RT_distance));
+    Serial.print("  RT_distance=" + String (RT_distance));
     float processed_distance = Ultrasonic_Sensor.ReadUltrasonic_Sensor(0x00,PROCESSED_DISTANCE_REG);
-    mySerial.print("  processed_distance=" + String (processed_distance));
+    Serial.print("  processed_distance=" + String (processed_distance));
     bool changeaddress = Ultrasonic_Sensor.ChangeAddress(0x00 , 11); // change the id address of Ultrasonic_Sensor from 0x00 to 0x0B
-    mySerial.print("  CID=" + String (changeaddress));
+    Serial.print("  CID=" + String (changeaddress));
     RT_distance = Ultrasonic_Sensor.ReadUltrasonic_Sensor(0x0B,REALTIME_DISTANCE_REG);
-    mySerial.print("  RT_distance=" + String (RT_distance));
+    Serial.print("  RT_distance=" + String (RT_distance));
     changeaddress = Ultrasonic_Sensor.ChangeAddress(11 , 0x00);  // change the id address of Ultrasonic_Sensor from 0x0B to 0x00
-    mySerial.print("  CID=" + String (changeaddress));
+    Serial.print("  CID=" + String (changeaddress));
 
     // Second sensor
     addressID = Ultrasonic_Sensor.ReadUltrasonic_Sensor(0x01,ADDRESS_REG);
-    mySerial.print("  ID=" + String (addressID));
+    Serial.print("  ID=" + String (addressID));
     RT_distance = Ultrasonic_Sensor.ReadUltrasonic_Sensor(0x01,REALTIME_DISTANCE_REG);
-    mySerial.print("  RT_distance=" + String (RT_distance));
+    Serial.print("  RT_distance=" + String (RT_distance));
     processed_distance = Ultrasonic_Sensor.ReadUltrasonic_Sensor(0x01,PROCESSED_DISTANCE_REG);
-    mySerial.print("  processed_distance=" + String (processed_distance));
+    Serial.print("  processed_distance=" + String (processed_distance));
     changeaddress = Ultrasonic_Sensor.ChangeAddress(0x01 , 11); // change the id address of Ultrasonic_Sensor from 0x01 to 0x0B
-    mySerial.print("  CID=" + String (changeaddress));
+    Serial.print("  CID=" + String (changeaddress));
     RT_distance = Ultrasonic_Sensor.ReadUltrasonic_Sensor(0x0B,REALTIME_DISTANCE_REG);
-    mySerial.print("  RT_distance=" + String (RT_distance));
+    Serial.print("  RT_distance=" + String (RT_distance));
     changeaddress = Ultrasonic_Sensor.ChangeAddress(11 , 0x01);  // change the id address of Ultrasonic_Sensor from 0x0B to 0x01
-    mySerial.println("  CID=" + String (changeaddress));
+    Serial.println("  CID=" + String (changeaddress));
   }
   else
   {
-    mySerial.println("Check if both sensors are connected correctly on the Modbus");
+    Serial.println("Check if both sensors are connected correctly on the Modbus");
   }
 }

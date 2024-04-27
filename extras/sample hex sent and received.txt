@@ -39,5 +39,8 @@ FF 06 02 00 00 01 5C 6C
 Description: The sensor address is modified from any address to 0x01
 
 Reading address using Broadcast ID:
+Host:
 0xFF 0x03 0x02 0x00 0x00 0x01 0x90 0x6C
-
+Slave response:
+00 03 02 07 73 C6 51 
+Description: Sensor address is the 1st byte 0x00

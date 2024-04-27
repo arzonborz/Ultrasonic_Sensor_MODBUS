@@ -14,10 +14,46 @@ Ultrasonic_Sensor_MODBUS::Ultrasonic_Sensor_MODBUS(Stream *port)
 	_port=port;
 }
 
+// special function because the sensor is not responding as expected    ***********
+// the sensor Doesnot allow conventional Read For the address register  ***********
 // ReadAddress read and retuns the ID address of the Ultrasonic_Sensor sensor on the RS485 MODBUS. There should only be one Ultrasonic_Sensor sensor connected to the bus at a time because this function uses the broadcast ID address
-int Ultrasonic_Sensor_MODBUS::ReadAddress()
+int Ultrasonic_Sensor_MODBUS::ReadAddress(byte id=BROADCAST_ID)
 {
-  return this->ReadUltrasonic_Sensor(BROADCAST_ID,ADDRESS_REG);
+  String reg =ADDRESS_REG;
+  if ( id<0 || id >255 )
+  {
+    return -255;
+  }
+  if (reg!=ADDRESS_REG && reg!=PROCESSED_DISTANCE_REG && reg!=REALTIME_DISTANCE_REG )
+  {
+    return -254;
+  }
+  
+  //Fix address to hex string:
+  String sensor_ID = String(id, HEX);
+  sensor_ID.toUpperCase();
+  //The address should be like XY. Add zeros if we need it
+  if (sensor_ID.length() == 1) {
+    sensor_ID = "0" + sensor_ID;
+  }
+  //Build the message
+  String msg = sensor_ID + String(READ_REG) + String(reg) + String(ONE16BITS_REG);
+  msg += this->ModRTU_CRC(msg);
+
+  //Wait for answer and put it in a buffer
+  float retVal;
+  byte buf[8];
+  uint16_t timeout = reg == REALTIME_DISTANCE_REG ? TIMEOUT_Ultrasonic_Sensor_REALTIME : TIMEOUT_Ultrasonic_Sensor_PROCESSED ;
+  bool transResult = this->RS485_TRANSEIVER( msg , 8, buf, 7, timeout);
+  if (!transResult) return -253;
+
+  // Check if the Ultrasonic_Sensor sensor is read successfully then decode the retVal
+  if (buf[1]==StrtoByte(READ_REG)) 
+  {
+    retVal = buf[0];
+    return retVal;
+  }
+  else return -252;
 }
 
 // SetAddress returns a boolean to determine succeful operation. This function Sets the ID address of the Ultrasonic_Sensor sensor on the RS485 MODBUS. There should only be one Ultrasonic_Sensor sensor connected to the bus at a time because this function uses the broadcast ID address
@@ -26,10 +62,12 @@ bool Ultrasonic_Sensor_MODBUS::SetAddress(byte newId)
   return this->ChangeAddress(BROADCAST_ID,newId);
 }
 
+// special function because the sensor is not responding as expected    ***********
+// the sensor Doesnot allow conventional Read For the address register  ***********
 // CheckAddress returns a boolean and checks if the Sensor ID is present on RS485 MODBUS
 bool Ultrasonic_Sensor_MODBUS::CheckAddress(byte id)
 {
-  return this->ReadUltrasonic_Sensor(id,ADDRESS_REG)==id;
+  return this->ReadAddress(id)==id;
 }
 
 // ChangeAddress changes the id address of a given Ultrasonic_Sensor id address if the new address is not already taken on the RS485 MODBUS
@@ -89,7 +127,7 @@ float Ultrasonic_Sensor_MODBUS::ReadUltrasonic_Sensor(byte id, String reg)
   //Wait for answer and put it in a buffer
   float retVal;
   byte buf[8];
-  uint16_t timeout = reg == PROCESSED_DISTANCE_REG ? TIMEOUT_Ultrasonic_Sensor_PROCESSED : TIMEOUT_Ultrasonic_Sensor_REALTIME;
+  uint16_t timeout = reg == REALTIME_DISTANCE_REG ? TIMEOUT_Ultrasonic_Sensor_REALTIME : TIMEOUT_Ultrasonic_Sensor_PROCESSED ;
   bool transResult = this->RS485_TRANSEIVER( msg , 8, buf, 7, timeout);
   if (!transResult) return -253;
 
