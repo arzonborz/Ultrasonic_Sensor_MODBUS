@@ -35,7 +35,7 @@ class Ultrasonic_Sensor_MODBUS
 {
     public:
         Ultrasonic_Sensor_MODBUS(Stream *port);
-		int ReadAddress();
+		int ReadAddress(byte id=BROADCAST_ID);
 		bool SetAddress(byte newId);
 		bool CheckAddress(byte id);
 		bool ChangeAddress(byte oldID , byte newId);
