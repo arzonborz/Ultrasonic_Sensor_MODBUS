@@ -2,6 +2,8 @@
 
 ![Version](https://img.shields.io/badge/Version-v1.0.0-green.svg)
 
+*** IMPORTANT : The djlk ultrasonic module i tested proved to be utterly useless due to inconsistent readings. This library is just for documentation in case someone wants to try this cheap module without going through chinese documentations ***
+
 ***Please Note: This is a personal effort and the product manufacturer is not related nor responsible for using or supporting this library***
 
 ![image](https://github.com/arzonborz/Ultrasonic_Sensor_MODBUS/assets/61315293/a915c304-4a2f-415a-b956-8cb1793dddfd)

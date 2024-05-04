@@ -3,14 +3,11 @@
   Multiple sensors test with softwareSerial
 
   In this example the arduino is connected to a ttl to RS485 converter module. 
-  On the RS485 converter module two Chinese djlk Ultrasonic_Sensor are connected (with 
-  id addresses set to 0x00 and 0x01). A ttl to usb FTDI converter is used to 
-  view the date using softwareSerial.
+  To the RS485 converter module multiple Chinese djlk Ultrasonic Sensor is connected. The Serial monitor
+  is used to view the date using softwareSerial.
 
   The circuit:
-  * Pin 10, 11 are connected TX, RX of the FTDI respectively
-  * Pin 0(RX),1(TX) are connected to RX and TX of the ttl to RS485 converter
-    respectively
+  * Pin 10, 11 are connected to RX and TX of the ttl to RS485 converter respectively
 
   Created 27/4/2024
   By Ghaith Alshishani
